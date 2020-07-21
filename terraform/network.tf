@@ -3,14 +3,13 @@ resource "azurerm_virtual_network" "hub" {
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
   address_space       = [local.vnet_hub_iprange]
-  dns_servers         = [local.dns_server_private_ip]
 }
 
 resource "azurerm_subnet" "firewall" {
   name                 = local.firewall_subnet
   resource_group_name  = azurerm_resource_group.hub.name
   virtual_network_name = azurerm_virtual_network.hub.name
-  address_prefix       = local.firewall_subnet_iprange
+  address_prefixes       = [local.firewall_subnet_iprange]
 }
 
 
@@ -19,21 +18,36 @@ resource "azurerm_virtual_network" "spoke" {
   location            = azurerm_resource_group.spoke.location
   resource_group_name = azurerm_resource_group.spoke.name
   address_space       = [local.vnet_spoke_iprange]
-  dns_servers         = [local.dns_server_private_ip]
 }
 
 resource "azurerm_subnet" "appgateway" {
   name                 = local.appgateway_subnet
   resource_group_name  = azurerm_resource_group.spoke.name
   virtual_network_name = azurerm_virtual_network.spoke.name
-  address_prefix       = local.appgateway_subnet_iprange
+  address_prefixes       = [local.appgateway_subnet_iprange]
 }
 
 resource "azurerm_subnet" "web" {
   name                 = local.web_subnet
   resource_group_name  = azurerm_resource_group.spoke.name
   virtual_network_name = azurerm_virtual_network.spoke.name
-  address_prefix       = local.web_subnet_iprange
+  address_prefixes       = [local.web_subnet_iprange]
+  enforce_private_link_endpoint_network_policies = true
+}
+
+resource "azurerm_subnet" "data" {
+  name                 = local.data_subnet
+  resource_group_name  = azurerm_resource_group.spoke.name
+  virtual_network_name = azurerm_virtual_network.spoke.name
+  address_prefixes       = [local.data_subnet_iprange]
+  enforce_private_link_endpoint_network_policies = true
+}
+
+resource "azurerm_subnet" "web_se" {
+  name                 = local.web_se_subnet
+  resource_group_name  = azurerm_resource_group.spoke.name
+  virtual_network_name = azurerm_virtual_network.spoke.name
+  address_prefixes       = [local.web_se_subnet_iprange]
   service_endpoints = [ "Microsoft.Web" ]
 
   delegation {
@@ -43,15 +57,6 @@ resource "azurerm_subnet" "web" {
       actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
     }
   }
-}
-
-resource "azurerm_subnet" "data" {
-  name                 = local.data_subnet
-  resource_group_name  = azurerm_resource_group.spoke.name
-  virtual_network_name = azurerm_virtual_network.spoke.name
-  address_prefix       = local.data_subnet_iprange
-  enforce_private_link_endpoint_network_policies = true
-  service_endpoints = [ "Microsoft.Storage" ]
 }
 
 resource "azurerm_virtual_network_peering" "hubtospoke" {

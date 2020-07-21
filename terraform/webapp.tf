@@ -4,8 +4,8 @@ resource "azurerm_app_service_plan" "appplan" {
   resource_group_name = azurerm_resource_group.spoke.name
 
   sku {
-    tier = "Standard"
-    size = "S1"
+    tier = "PremiumV2"
+    size = "P1V2"
   }
 }
 
@@ -29,23 +29,11 @@ resource "azurerm_app_service" "website" {
     "TABLE_NAME"                     = local.storage_data_table_name
   }
 
-  site_config {
-    ip_restriction {
-        virtual_network_subnet_id = azurerm_subnet.web.id
-    }
-    ip_restriction{
-        ip_address = "${lookup(jsondecode(data.http.httpbin.body), "origin")}/32"
-    }
-    ip_restriction{
-        ip_address = "${azurerm_public_ip.gateway.ip_address}/32"
-    }
-  }
-
   depends_on = [azurerm_application_gateway.appgateway]
 
 }
 
 resource "azurerm_app_service_virtual_network_swift_connection" "webapp" {
   app_service_id = azurerm_app_service.website.id
-  subnet_id      = azurerm_subnet.web.id
+  subnet_id      = azurerm_subnet.web_se.id
 }

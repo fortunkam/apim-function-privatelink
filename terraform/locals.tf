@@ -16,6 +16,8 @@ locals  {
     appgateway_subnet_iprange="10.1.0.0/24"
     web_subnet_iprange="10.1.1.0/24"
     data_subnet_iprange="10.1.2.0/24"
+    web_se_subnet="web-se"
+    web_se_subnet_iprange="10.1.4.0/24"
     hub_to_spoke_vnet_peer="${var.prefix}-hub-spoke-peer"
     spoke_to_hub_vnet_peer="${var.prefix}-spoke-hub-peer"
     dns_server_private_ip="10.0.1.128"
@@ -63,4 +65,9 @@ locals  {
     dns_github_application_rule="github_rule"
     dns_npm_application_rule_collection="npm_rule_collection"
     dns_npm_application_rule="npm_rule"
+
+    web_sites_private_link="${var.prefix}-web-private-link"
+    web_sites_private_endpoint="${var.prefix}-web-private-endpoint"
+    web_sites_dns_zone="privatelink.azurewebsites.net"
+    web_sites_dns_link_spoke="${var.prefix}-web-dns-spoke-link"
 }

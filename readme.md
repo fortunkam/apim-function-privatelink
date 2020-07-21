@@ -15,7 +15,7 @@ The script will create
 - 4 subnets
 - A storage account with table storage accessible via a private endpoint
 - A private DNS zone to allow resolution of the storage private endpoint
-- An App Service (Website + plan) running a simple node application, public access is restricted through the firewall, network access is allowed through a private endpoint.
+- An App Service (Website + plan) running a simple node application, public access is restricted through the firewall, network access is allowed through a private endpoint.  (Note: private endpoints for web apps are currently in preview and limited to Premium V2 App Service plans)
 - A Firewall that all outbound network traffic is routing through
 - An App Gateway that all inbound traffic to the app service is routed through.
 

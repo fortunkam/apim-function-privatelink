@@ -2,8 +2,8 @@ resource "azurerm_public_ip" "gateway" {
   name                = local.appgateway_publicip
   location            = azurerm_resource_group.spoke.location
   resource_group_name = azurerm_resource_group.spoke.name
-  allocation_method   = "Dynamic"
-  sku                 = "Basic"
+  allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_application_gateway" "appgateway" {
@@ -12,9 +12,9 @@ resource "azurerm_application_gateway" "appgateway" {
   location            = azurerm_resource_group.spoke.location
 
   sku {
-    name     = "Standard_Small"
-    tier     = "Standard"
-    capacity = 2
+    name     = "Standard_v2"
+    tier     = "Standard_v2"
+    capacity = 1
   }
 
   gateway_ip_configuration {
@@ -30,7 +30,7 @@ resource "azurerm_application_gateway" "appgateway" {
   frontend_ip_configuration {
     name                 = local.appgateway_frontend_ip_configuration_name
     public_ip_address_id = azurerm_public_ip.gateway.id
-    private_ip_address  = local.appgateway_private_ip_address
+    #private_ip_address  = local.appgateway_private_ip_address
   }
 
   probe {
