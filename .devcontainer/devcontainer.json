@@ -1,0 +1,20 @@
+{
+    "name": "VSCodeOnline",
+    "dockerFile": "Dockerfile",
+    "runArgs": [
+        "-v",
+        "/var/run/docker.sock:/var/run/docker.sock"
+    ],
+    "settings":  { 
+        "window.zoomLevel": 0,
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "files.eol": "\n"
+    },
+    "extensions": [
+        "ms-azuretools.vscode-azureterraform",
+        "mauve.terraform",
+        "ms-vscode.azure-account",
+        "ms-azuretools.vscode-azurevirtualmachines",
+        "ms-vscode.vscode-node-azure-pack"
+    ]
+}

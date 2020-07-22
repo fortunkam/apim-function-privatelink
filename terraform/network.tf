@@ -91,3 +91,8 @@ resource "azurerm_subnet_route_table_association" "web_to_dns" {
   subnet_id      = azurerm_subnet.web.id
   route_table_id = azurerm_route_table.web.id
 }
+
+resource "azurerm_subnet_route_table_association" "web_se_to_dns" {
+  subnet_id      = azurerm_subnet.web_se.id
+  route_table_id = azurerm_route_table.web.id
+}
