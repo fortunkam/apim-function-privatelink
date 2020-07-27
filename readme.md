@@ -12,7 +12,7 @@ The resources can be cleaned up by running `terraform destroy`
 The script will create 
 - 2 resource groups
 - 2 virtual networks (peered)
-- 4 subnets
+- 5 subnets
 - A storage account with table storage accessible via a private endpoint
 - A private DNS zone to allow resolution of the storage private endpoint
 - An App Service (Website + plan) running a simple node application, public access is restricted through the firewall, network access is allowed through a private endpoint.  (Note: private endpoints for web apps are currently in preview and limited to Premium V2 App Service plans)
@@ -23,8 +23,10 @@ The script will create
 
 ![Inbound traffic routing](/diagrams/inbound%20calls.png "inbound calls")
 
-1. A request comes into the Application gateway public ip address.  The App Gateway forwards the request onto the website.
-2. The website uses access restrictions to prevent access on the public endpoint to only the ip address of the Application Gateway and the user that ran the script.
+1. A request comes into the Application gateway public ip address.  
+2. The Application gateway uses the private DNS zone to resolve the web app.
+3. The private DNS zone resolves to an internal address for the web app.
+3. The Application gateway calls the web app over the vnet.
 
 ## How are internet calls from my website routed?
 
@@ -34,7 +36,7 @@ The application that gets deployed makes calls to http://httpbin.org/ip to retri
 By default a website with a vnet intergration will always go direct for outbound internet calls (using the app service shared outbound ips).  By adding the `WEBSITE_VNET_ROUTE_ALL=1` setting it will use the UDR applied to the subnet.
 
 1. The website has a private endpoint nic allocated to the web subnet.  
-2. The web subnet contains a UDR that routes all traffic to the Azure Firewall.
+2. The web_se subnet contains a UDR that routes all traffic to the Azure Firewall.
 3. The firewall contains application rules that allow traffic to httpbin.org (for the running application), github and npm (for the application build).
 
 The `/ip` route on the website shows the call to httpbin.org/ip is successful and should also return the IP address of the firewall showing the request has been routed.

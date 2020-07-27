@@ -41,6 +41,7 @@ resource "azurerm_subnet" "data" {
   virtual_network_name = azurerm_virtual_network.spoke.name
   address_prefixes       = [local.data_subnet_iprange]
   enforce_private_link_endpoint_network_policies = true
+  service_endpoints = [ "Microsoft.Storage" ]
 }
 
 resource "azurerm_subnet" "web_se" {
