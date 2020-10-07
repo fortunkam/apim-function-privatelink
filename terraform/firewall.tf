@@ -107,3 +107,34 @@ resource "azurerm_firewall_application_rule_collection" "npm" {
     }
   }
 }
+
+resource "azurerm_firewall_application_rule_collection" "nuget" {
+  name                = local.dns_nuget_application_rule_collection
+  azure_firewall_name = azurerm_firewall.firewall.name
+  resource_group_name = azurerm_resource_group.hub.name
+  priority            = 400
+  action              = "Allow"
+
+  rule {
+    name = local.dns_nuget_application_rule
+
+    source_addresses = [
+      "*",
+    ]
+
+    target_fqdns = [
+      "api.nuget.org",
+      "www.nuget.org"
+    ]
+
+    protocol {
+      port = "443"
+      type = "Https"
+    }
+
+    protocol {
+      port = "80"
+      type = "Http"
+    }
+  }
+}

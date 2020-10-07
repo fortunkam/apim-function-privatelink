@@ -12,6 +12,13 @@ resource "azurerm_subnet" "firewall" {
   address_prefixes       = [local.firewall_subnet_iprange]
 }
 
+resource "azurerm_subnet" "bastion" {
+  name                 = local.bastion_subnet
+  resource_group_name  = azurerm_resource_group.hub.name
+  virtual_network_name = azurerm_virtual_network.hub.name
+  address_prefixes       = [local.bastion_subnet_iprange]
+}
+
 
 resource "azurerm_virtual_network" "spoke" {
   name                = local.vnet_spoke_name
@@ -20,18 +27,18 @@ resource "azurerm_virtual_network" "spoke" {
   address_space       = [local.vnet_spoke_iprange]
 }
 
-resource "azurerm_subnet" "appgateway" {
-  name                 = local.appgateway_subnet
-  resource_group_name  = azurerm_resource_group.spoke.name
-  virtual_network_name = azurerm_virtual_network.spoke.name
-  address_prefixes       = [local.appgateway_subnet_iprange]
+resource "azurerm_subnet" "apim" {
+  name                 = local.apim_subnet
+  resource_group_name  = azurerm_resource_group.hub.name
+  virtual_network_name = azurerm_virtual_network.hub.name
+  address_prefixes       = [local.apim_subnet_iprange]
 }
 
-resource "azurerm_subnet" "web" {
-  name                 = local.web_subnet
+resource "azurerm_subnet" "function" {
+  name                 = local.function_subnet
   resource_group_name  = azurerm_resource_group.spoke.name
   virtual_network_name = azurerm_virtual_network.spoke.name
-  address_prefixes       = [local.web_subnet_iprange]
+  address_prefixes       = [local.function_subnet_iprange]
   enforce_private_link_endpoint_network_policies = true
 }
 
@@ -44,12 +51,13 @@ resource "azurerm_subnet" "data" {
   service_endpoints = [ "Microsoft.Storage" ]
 }
 
-resource "azurerm_subnet" "web_se" {
-  name                 = local.web_se_subnet
+
+resource "azurerm_subnet" "function_se" {
+  name                 = local.function_se_subnet
   resource_group_name  = azurerm_resource_group.spoke.name
   virtual_network_name = azurerm_virtual_network.spoke.name
-  address_prefixes       = [local.web_se_subnet_iprange]
-  service_endpoints = [ "Microsoft.Web" ]
+  address_prefixes       = [local.function_se_subnet_iprange]
+  service_endpoints = [ "Microsoft.Web" , "Microsoft.Storage" ]
 
   delegation {
     name = "webdelegation"
@@ -74,7 +82,7 @@ resource "azurerm_virtual_network_peering" "spoketohub" {
   remote_virtual_network_id = azurerm_virtual_network.hub.id
 }
 
-resource "azurerm_route_table" "web" {
+resource "azurerm_route_table" "function" {
   name                          = local.firewall_route_table_name
   location                      = azurerm_resource_group.spoke.location
   resource_group_name           = azurerm_resource_group.spoke.name
@@ -88,12 +96,12 @@ resource "azurerm_route_table" "web" {
   }
 }
 
-resource "azurerm_subnet_route_table_association" "web_to_dns" {
-  subnet_id      = azurerm_subnet.web.id
-  route_table_id = azurerm_route_table.web.id
+resource "azurerm_subnet_route_table_association" "function_to_dns" {
+  subnet_id      = azurerm_subnet.function.id
+  route_table_id = azurerm_route_table.function.id
 }
 
-resource "azurerm_subnet_route_table_association" "web_se_to_dns" {
-  subnet_id      = azurerm_subnet.web_se.id
-  route_table_id = azurerm_route_table.web.id
+resource "azurerm_subnet_route_table_association" "function_se_to_dns" {
+  subnet_id      = azurerm_subnet.function_se.id
+  route_table_id = azurerm_route_table.function.id
 }
