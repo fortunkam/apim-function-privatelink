@@ -18,6 +18,7 @@ The script will create
 - A Function (and app service plan) running a C# application, public access is restricted via the private endpoint, only resources on the vnet (or peered vnet) can access the resource.
 - A Firewall that all outbound network traffic is routing through
 - An API Management Instance that is public facing and connected to the vnet (the APIM isn't configured to point at the function but can be).
+- A VM connected to the hub network with a public IP (in case you need to check the function resources on the vnet)
 
 Note: The storage account also has a private endpoint for blob storage.  This is because a storage account is required by the function app to store secrets and state. By using the private endpoint it can access this storage prviately.
 
